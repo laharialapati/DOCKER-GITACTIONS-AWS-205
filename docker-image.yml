@@ -28,8 +28,7 @@ jobs:
           context: ./STUDENTAPI-SPRINGBOOT
           file: ./STUDENTAPI-SPRINGBOOT/backend.Dockerfile
           push: true
-          tags: |
-            ${{ secrets.DOCKER_USER }}/dockeraws-backend:latest
+          tags: ${{ secrets.DOCKER_USER }}/dockeraws-backend:latest
 
       - name: Build and push frontend image
         uses: docker/build-push-action@v6
@@ -37,8 +36,7 @@ jobs:
           context: ./STUDENTAPI-REACT
           file: ./STUDENTAPI-REACT/frontend.Dockerfile
           push: true
-          tags: |
-            ${{ secrets.DOCKER_USER }}/dockeraws-frontend:latest
+          tags: ${{ secrets.DOCKER_USER }}/dockeraws-frontend:latest
 
       - name: Save EC2 private key
         run: |
@@ -48,9 +46,7 @@ jobs:
       - name: Deploy to AWS EC2
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ec2-user@${{ secrets.AWS_IP }} << 'EOF'
-            if [ ! -d "DOCKER-GITACTIONS-AWS-205" ]; then
-              git clone https://github.com/${{ github.repository }}.git
-            fi
+            cd DOCKER-GITACTIONS-AWS-205|| git clone https://github.com/${{ github.repository }}.git
             cd DOCKER-GITACTIONS-AWS-205
             git pull origin main
             sudo docker-compose down
